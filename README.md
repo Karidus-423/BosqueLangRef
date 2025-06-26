@@ -43,14 +43,9 @@ Failure is inevitable and mitigation/recovery is a requirement for reliable
 and scalable systems. Give un-happy path processing first-class support in the 
 language and ensure observability throughout the system.
 
-
-
-
-
-# Bosque Standard Library
+# Language Reference
 
 # Comments
-
 Bosque currently supports one type of comments. That is the normal comments.
 Using `//` to start them and end at the next EOL byte.
 
@@ -120,14 +115,20 @@ concepts.
 - Only annotaded numeric literals are supported.
 
 ```bsq
-// Invalid -> assert value == 42;
 // Valid -> assert value == 42i;
+// Invalid -> assert value == 42;
 ```
+
 
 ## Type Checker
 
 
+## Variables
 
+```bsq
+let bar: Nat = 32n;
+let var = 32I;
+```
 
 ## Methods
 
@@ -144,8 +145,97 @@ Bosque alternatives to representing boolean expressions from the usual.
 | and | `&&` | /\\(statement1,statement2) |
 | or | `\|\|` | \\/(statement1,statement2) |
 
+## Comparison Expression
+
+At the end of the day a comparison expression return a boolean. This is how
+to express it in Bosque.
+
+### Equals
+
+`33n == 33n`
+`-2i != -3i`
+
+### Strict Equals
+
+`0n === 3n`
+`0n !== 0n`
+`none === none`
+
+### Ranges
+
+`1n >= +3n`
+`33i <= -10i`
+
+### KeyComparator
+//TODO:  LEFT OFF HERE
+  
 
 
+## Namespaces
+Do declare namespaces we write the following at the top of the file.
+
+```
+declare namespace Main;
+```
+We are now able to declare variables to use on this namespace `Main`.
+
+```
+entity Bar { }
+
+function main(): Option<Bar> {
+    // Can use Option<Main::Bar> too.
+    return none; 
+}
+```
+
+
+
+### Namespace Import
+
+We are able to import other namespaces and rename them if necessary.
+```
+declare namespace Main {
+    using NSDiff; 
+    using NSOther as Other; 
+}
+```
+
+```
+function main(): Option<Other::Bar> {
+    return none; 
+}
+```
+
+
+## Entities
+
+```
+entity Foo {
+    field f: Int;
+} 
+```
+
+To access the fields of an entity we do the following.
+
+```
+function main(x: Foo): Int {
+    return x.f; 
+}
+```
+
+A field update is done as such.
+
+```
+function main(): Int {
+    //var v = Foo{1i};
+    //return v[x = 2i].x; 
+    // OR do this
+    
+    var v = Foo{1i};
+    return v[x = $x + 1i].x;
+}
+
+```
 
 
 ## Enums
@@ -162,6 +252,59 @@ Enums are accessed as such.
 return Foo#_f3;
 ```
 
+## Assert
+
+Boque provides *predicates* that should always be true, which are asserts.
+
+//TODO: What does an assert do when it fails?
+
+```bsq
+function main(): Int{
+    assert(true);
+    assert false;
+    
+    //They can be tagged too.
+    assert try false;
+    assert spec true;
+    
+    return 33i;
+}
+```
+
+## Debug
+
+//TODO: WHAT IS THIS?
+
+```
+function main(): Int {
+    _debug 5i;
+    return 1i; 
+}
+```
+
+## Binary Expressions
+
+### Addition
+They must be same type to work.
+
+`0n + 1n` -> Output is Nat.
+`34I + -1I` -> Output is BigInt.
+
+### Subtraction
+
+`+0N - 1N` -> Output is BigNat.
+`32i - -1i` -> Output is Int.
+
+
+### Division
+
+`+66I // +2I` -> Output is BigInt
+`+2i // -2i` -> Ouput is Int
+
+### Multiplication
+
+`11n * 3n` -> Output is Nat.
+`2N * 12N` -> Ouput is BigNat.
 
 
 ## if
@@ -173,4 +316,7 @@ if (x >= 5){
     x = y;
 }
 ```
+
+# Bosque Standard Library
+  
 
